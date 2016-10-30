@@ -112,6 +112,7 @@ class Robot(magicbot.MagicRobot):
             pressed_buttons.discard(button)
             return False
 
+
 # see comment in teleopPeriodic for information
 def rescale_js(value, deadzone=0.0, exponential=0.0, rate=1.0):
     value_negative = 1.0
@@ -130,6 +131,7 @@ def rescale_js(value, deadzone=0.0, exponential=0.0, rate=1.0):
         a = math.log(exponential + 1) / (1 - deadzone)
         value = (math.exp(a * (value - deadzone)) - 1) / exponential
     return value * value_negative * rate
+
 
 if __name__ == '__main__':
     wpilib.run(Robot)
