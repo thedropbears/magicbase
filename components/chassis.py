@@ -2,12 +2,11 @@
 import math
 import logging
 
-from wpilib import CANTalon, PIDController
+from wpilib import PIDController
 from wpilib.interfaces import PIDOutput, PIDSource
-
 from ctre import CANTalon
 
-from .bno055 import BNO055
+from utilities.bno055 import BNO055
 
 
 class BlankPIDOutput(PIDOutput):
@@ -34,22 +33,27 @@ class Chassis:
 
     # the number that you need to multiply the vz components by to get them in the appropriate directions
     #                   vx   vy
-    module_params = {'a': {'args': {'drive':13, 'steer':11, 'absolute':False,
+    """module_params = {'a': {'args': {'drive':13, 'steer':11, 'absolute':True,
                                     'reverse_drive':True, 'reverse_steer':True, 'zero_reading':30,      
                                     'drive_encoder':True, 'reverse_drive_encoder':True},                 
                            'vz': {'x':-vz_components['x'], 'y': vz_components['y']}},               
-                     'b': {'args': {'drive':8, 'steer':9, 'absolute':False,                         
+                     'b': {'args': {'drive':8, 'steer':9, 'absolute':True,                         
                                     'reverse_drive':False, 'reverse_steer':True, 'zero_reading':109,
                                     'drive_encoder':True, 'reverse_drive_encoder':True},             
                            'vz': {'x':-vz_components['x'], 'y':-vz_components['y']}},                
-                     'c': {'args': {'drive':2, 'steer':4, 'absolute':False,                          
+                     'c': {'args': {'drive':2, 'steer':4, 'absolute':True,                          
                                     'reverse_drive':False, 'reverse_steer':True, 'zero_reading':536,
                                     'drive_encoder':True, 'reverse_drive_encoder':True},             
                            'vz': {'x': vz_components['x'], 'y':-vz_components['y']}},                
-                     'd': {'args': {'drive':3, 'steer':6, 'absolute':False,                          
+                     'd': {'args': {'drive':3, 'steer':6, 'absolute':True,                          
                                     'reverse_drive':True, 'reverse_steer':True, 'zero_reading':389, 
                                     'drive_encoder':True, 'reverse_drive_encoder':True},             
                            'vz': {'x': vz_components['x'], 'y': vz_components['y']}}                 
+                     }"""
+    module_params = {'a': {'args': {'drive': 13, 'steer': 11, 'absolute': True,
+                                    'reverse_drive': True, 'reverse_steer': True, 'zero_reading': 30,
+                                    'drive_encoder': True, 'reverse_drive_encoder': True},
+                           'vz': {'x': -vz_components['x'], 'y': vz_components['y']}}
                      }
     # Use the magic here!
     bno055 = BNO055
@@ -224,7 +228,7 @@ class SwerveModule():
         # Different depending on whether we are using absolute encoders or not
         if absolute:
             self.counts_per_radian = 1024.0 / (2.0 * math.pi)
-            self._steer.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogEncoder)
+            self._steer.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute)
             self._steer.changeControlMode(CANTalon.ControlMode.Position)
             self._steer.reverseSensor(reverse_steer)
             self._steer.reverseOutput(not reverse_steer)
