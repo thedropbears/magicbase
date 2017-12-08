@@ -83,6 +83,8 @@ class Robot(magicbot.MagicRobot):
         self.pressed_buttons_gp = set()
         self.spin_rate = 5
 
+        self.modules = [self.module_a, self.module_b, self.module_c, self.module_d]
+
     def putData(self):
         # update the data on the smart dashboard
         # put the inputs to the dashboard
