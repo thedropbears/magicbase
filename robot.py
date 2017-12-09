@@ -20,7 +20,7 @@ class Robot(magicbot.MagicRobot):
         steer_talon_id=8, drive_talon_id=1, steer_enc_offset=0.261,
         reverse_steer_direction=True, reverse_steer_encoder=True,
         reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=2.54 * 3,
+        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
         drive_motor_free_speed=700,
         x_pos=0.3, y_pos=0.3)
     module_b = SwerveModule
@@ -28,7 +28,7 @@ class Robot(magicbot.MagicRobot):
         steer_talon_id=2, drive_talon_id=9, steer_enc_offset=0.252,
         reverse_steer_direction=True, reverse_steer_encoder=True,
         reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=2.54 * 3,
+        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
         drive_motor_free_speed=700,
         x_pos=-0.3, y_pos=0.3)
     module_c = SwerveModule
@@ -36,7 +36,7 @@ class Robot(magicbot.MagicRobot):
         steer_talon_id=4, drive_talon_id=14, steer_enc_offset=0.796,
         reverse_steer_direction=True, reverse_steer_encoder=True,
         reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=2.54 * 3,
+        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
         drive_motor_free_speed=700,
         x_pos=-0.3, y_pos=-0.3)
     module_d = SwerveModule
@@ -44,7 +44,7 @@ class Robot(magicbot.MagicRobot):
         steer_talon_id=11, drive_talon_id=10, steer_enc_offset=0.689,
         reverse_steer_direction=True, reverse_steer_encoder=True,
         reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=2.54 * 3,
+        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
         drive_motor_free_speed=700,
         x_pos=0.3, y_pos=-0.3)
 
