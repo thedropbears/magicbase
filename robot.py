@@ -3,8 +3,10 @@ import magicbot
 import wpilib
 
 from pyswervedrive.swervechassis import SwerveChassis
-from pyswervedrive.swervemodule import SwerveModule, SwerveModuleConfig
+from pyswervedrive.swervemodule import SwerveModule
 from utilities.bno055 import BNO055
+
+from ctre import CANTalon
 
 from networktables import NetworkTable
 
@@ -15,43 +17,29 @@ import math
 
 class Robot(magicbot.MagicRobot):
 
-    module_a: SwerveModule
-    module_a_cfg = SwerveModuleConfig(
-        steer_talon_id=8, drive_talon_id=13, steer_enc_offset=0.401,
-        reverse_steer_direction=True, reverse_steer_encoder=True,
-        reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
-        drive_motor_free_speed=700,
-        x_pos=0.3, y_pos=0.3)
-    module_b: SwerveModule
-    module_b_cfg = SwerveModuleConfig(
-        steer_talon_id=2, drive_talon_id=9, steer_enc_offset=0.249,
-        reverse_steer_direction=True, reverse_steer_encoder=True,
-        reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
-        drive_motor_free_speed=700,
-        x_pos=-0.3, y_pos=0.3)
-    module_c: SwerveModule
-    module_c_cfg = SwerveModuleConfig(
-        steer_talon_id=4, drive_talon_id=14, steer_enc_offset=0.797,
-        reverse_steer_direction=True, reverse_steer_encoder=True,
-        reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
-        drive_motor_free_speed=700,
-        x_pos=-0.3, y_pos=-0.3)
-    module_d: SwerveModule
-    module_d_cfg = SwerveModuleConfig(
-        steer_talon_id=11, drive_talon_id=6, steer_enc_offset=0.079,
-        reverse_steer_direction=True, reverse_steer_encoder=True,
-        reverse_drive_direction=False, reverse_drive_encoder=False,
-        drive_enc_gear_reduction=5.43956, wheel_diameter_meters=0.0254 * 3,
-        drive_motor_free_speed=700,
-        x_pos=0.3, y_pos=-0.3)
-
     chassis: SwerveChassis
+
+    module_drive_free_speed: float = 700.
 
     def createObjects(self):
         '''Create motors and stuff here'''
+
+        self.module_a = SwerveModule(  # top left module
+                steer_talon=CANTalon(8), drive_talon=CANTalon(13),
+                steer_enc_offset=0.401, x_pos=0.3, y_pos=0.3,
+                drive_free_speed=Robot.module_drive_free_speed)
+        self.module_b = SwerveModule(  # bottom left modulet
+                steer_talon=CANTalon(2), drive_talon=CANTalon(9),
+                steer_enc_offset=0.249, x_pos=-0.3, y_pos=0.3,
+                drive_free_speed=Robot.module_drive_free_speed)
+        self.module_c = SwerveModule(  # bottom right modulet
+                steer_talon=CANTalon(4), drive_talon=CANTalon(14),
+                steer_enc_offset=0.797, x_pos=-0.3, y_pos=-0.3,
+                drive_free_speed=Robot.module_drive_free_speed)
+        self.module_d = SwerveModule(  # top right modulet
+                steer_talon=CANTalon(11), drive_talon=CANTalon(6),
+                steer_enc_offset=0.079, x_pos=0.3, y_pos=-0.3,
+                drive_free_speed=Robot.module_drive_free_speed)
 
         # Objects that are created here are shared with all classes
         # that declare them. For example, if I had:
@@ -104,7 +92,7 @@ class Robot(magicbot.MagicRobot):
             if self.debounce(1):
                 # perform some action
                 pass
-        except:
+        except Exception:
             self.onException()
 
         # this is where the joystick inputs get converted to numbers that are sent
@@ -116,10 +104,6 @@ class Robot(magicbot.MagicRobot):
         vy = -rescale_js(self.joystick.getX(), deadzone=0.05, exponential=1.2, rate=4)
         vz = -rescale_js(self.joystick.getZ(), deadzone=0.2, exponential=15.0, rate=self.spin_rate)
         self.chassis.set_inputs(vx, vy, vz)
-        # x = throttle*-rescale_js(self.joystick.getY(), deadzone=0.05, exponential=1.2, rate=4)
-        # y = throttle*-rescale_js(self.joystick.getX(), deadzone=0.05, exponential=1.2, rate=4)
-        # z = throttle*-rescale_js(self.joystick.getZ(), deadzone=0.2, exponential=15.0, rate=self.spin_rate)
-        # self.module_b.set_velocity(x, y)
 
     # the 'debounce' function keeps tracks of which buttons have been pressed
     def debounce(self, button, gamepad=False):
