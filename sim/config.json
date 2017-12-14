@@ -1,0 +1,27 @@
+{
+  "pyfrc": {
+    "robot": {
+      "w": 1.968504,
+      "h": 1.968504,
+      "starting_x": 2,
+      "starting_y": 20,
+      "starting_angle": 0
+    },
+    "field": {
+      "w": 25,
+      "h": 27,
+      "px_per_ft": 10
+    },
+    "CAN": {
+      "8": "Front Left Steer Motor",
+      "2": "Rear Left Steer Motor",
+      "4": "Rear Right Steer Motor",
+      "11": "Front Right Steer Motor",
+      "13": "Front Left Drive Motor",
+      "9": "Rear Left Drive Motor",
+      "14": "Rear Right Drive Motor",
+      "6": "Front Right Drive Motor"
+    }
+  }
+}
+
