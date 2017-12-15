@@ -25,6 +25,8 @@ class PhysicsEngine:
         self.module_drive_can_ids = [13, 9, 14, 6]
         self.module_steer_offsets = [0.401, 0.249, 0.797, 0.079]
 
+        self.controller.add_device_gyro_channel('bno055')
+
     def initialize(self, hal_data):
         pass
 
@@ -54,11 +56,9 @@ class PhysicsEngine:
             hal_data['CAN'][can_id]['enc_position'] = value/4096
             position = (hal_data['CAN'][can_id]['enc_position']-offset) / SwerveModule.STEER_COUNTS_PER_RADIAN
             position_degrees = math.degrees(-position) % 360
-            print(position_degrees)
             steer_positions.append(position_degrees)
 
         lf_angle, lr_angle, rr_angle, rf_angle = steer_positions
-        print(steer_positions)
         x_wheelbase = self.X_WHEELBASE/0.3048  # convert m to feet
         y_wheelbase = self.Y_WHEELBASE/0.3048  # convert m to feet
         vx, vy, vw = \
