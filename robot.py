@@ -26,19 +26,20 @@ class Robot(magicbot.MagicRobot):
 
         self.module_a = SwerveModule(  # top left module
                 steer_talon=CANTalon(8), drive_talon=CANTalon(13),
-                steer_enc_offset=0.401, x_pos=0.3, y_pos=0.3,
-                drive_free_speed=Robot.module_drive_free_speed)
+                steer_enc_offset=-2.703, x_pos=0.3, y_pos=0.3,
+                drive_free_speed=Robot.module_drive_free_speed,
+                reverse_drive_direction=True, reverse_drive_encoder=True)
         self.module_b = SwerveModule(  # bottom left modulet
                 steer_talon=CANTalon(2), drive_talon=CANTalon(9),
-                steer_enc_offset=0.249, x_pos=-0.3, y_pos=0.3,
+                steer_enc_offset=-2.750, x_pos=-0.3, y_pos=0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
         self.module_c = SwerveModule(  # bottom right modulet
                 steer_talon=CANTalon(4), drive_talon=CANTalon(14),
-                steer_enc_offset=0.797, x_pos=-0.3, y_pos=-0.3,
+                steer_enc_offset=-1.888, x_pos=-0.3, y_pos=-0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
         self.module_d = SwerveModule(  # top right modulet
                 steer_talon=CANTalon(11), drive_talon=CANTalon(6),
-                steer_enc_offset=0.079, x_pos=0.3, y_pos=-0.3,
+                steer_enc_offset=-2.925, x_pos=0.3, y_pos=-0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
 
         # Objects that are created here are shared with all classes
