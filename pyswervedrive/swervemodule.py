@@ -100,6 +100,52 @@ class SwerveModule:
                                              / self.drive_counts_per_metre)
         return steer_delta, drive_delta
 
+    def reset_encoder_delta(self):
+        """Re-zero the encoder deltas as returned from
+        get_encoder_delta.
+        This is intended to be called by the SwerveChassis in order to track
+        odometry.
+        """
+        self.zero_azimuth = self.current_azimuth
+        self.zero_drive_pos = (self.drive_motor.getPosition()
+                               / self.drive_counts_per_metre)
+
+    def get_encoder_delta(self):
+        """Return the difference between the modules' current position and
+        their position at the last time reset_encoder_delta was called.
+        This is intended to be called by the SwerveChassis in order to track
+        odometry.
+        """
+        azimuth_delta = self.zero_azimuth - self.zero_azimuth
+        drive_delta = self.zero_drive_pos - (self.drive_motor.getPosition()
+                                             / self.drive_counts_per_metre)
+        return azimuth_delta, drive_delta
+
+    def get_cartesian_delta(self):
+        """Return the [x, y] position deltas for this module since the last
+        time reset_encoder_delta was called.
+        This is intended to be called by the SwerveChassis in order to track
+        odometry.
+        """
+        azimuth_delta, drive_delta = self.get_encoder_delta()
+
+        current_azimuth = (self.drive_motor.getSelectedSensorPosition()
+                           / self.drive_counts_per_metre)
+        avg_azimuth = current_azimuth - (azimuth_delta / 2)
+
+        drive_x_delta = drive_delta * math.cos(avg_azimuth)
+        drive_y_delta = drive_delta * math.sin(avg_azimuth)
+
+        return (drive_x_delta, drive_y_delta)
+
+    def get_cartesian_vel(self):
+        azimuth = self.current_measured_azimuth
+        drive_speed = self.current_speed
+
+        drive_x_vel = drive_speed * math.cos(azimuth)
+        drive_y_vel = drive_speed * math.sin(azimuth)
+        return drive_x_vel, drive_y_vel
+
     def set_velocity(self, vx, vy):
         """Set the x and y components of the desired module velocity, relative
         to the robot.
@@ -157,6 +203,19 @@ class SwerveModule:
         """Return the current azimuth from the controller setpoint in radians."""
         setpoint = self.steer_motor.getClosedLoopTarget()
         return float(setpoint - self.steer_enc_offset) / self.STEER_COUNTS_PER_RADIAN
+
+    @property
+    def current_measured_azimuth(self):
+        """Return the azimuth of the wheel as measured by the encoder."""
+        pos = self.steer_motor.getSelectedSensorPosition()
+        return constrain_angle(float(pos - self.steer_enc_offset)
+                               / self.STEER_COUNTS_PER_RADIAN)
+
+    @property
+    def current_speed(self):
+        """Return the current speed of the module's wheel"""
+        wheel_vel = self.drive_motor.getSelectedSensorVelocity()
+        return wheel_vel / self.drive_velocity_to_native_units
 
     @staticmethod
     def min_angular_displacement(current, target):

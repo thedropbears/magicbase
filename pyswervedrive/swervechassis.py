@@ -1,5 +1,6 @@
 from pyswervedrive.swervemodule import SwerveModule
 from utilities.bno055 import BNO055
+import numpy as np
 import math
 
 import hal
@@ -13,9 +14,6 @@ class SwerveChassis:
     module_c: SwerveModule
     module_d: SwerveModule
 
-    # multiply both by vz and the number that you need to multiply the vz
-    # components by to get them in the appropriate directions
-
     def __init__(self):
         self.vx = 0
         self.vy = 0
@@ -26,6 +24,35 @@ class SwerveChassis:
         self.modules = [self.module_a, self.module_b, self.module_c, self.module_d]
 
     def on_enable(self):
+        # matrix which translates column vector of [x, y, z] in robot frame of
+        # reference to module [x, y] movement
+        self.A_matrix = np.array([
+            [1, 0, -1],
+            [0, 1,  1],
+            [1, 0, -1],
+            [0, 1, -1],
+            [1, 0,  1],
+            [0, 1, -1],
+            [1, 0,  1],
+            [0, 1,  1]
+            ])
+        # figure out the contribution of the robot's overall rotation about the
+        # z axis to each module's movement, and encode that information in our
+        # matrix
+        for i, module in enumerate(self.modules):
+            module_dist = math.hypot(module.x_pos,
+                                     module.y_pos)
+            z_comp = module_dist/2
+            # third column in A matrix already encodes direction of robot's
+            # vz index upon the module's axis, just need to multiply to
+            # encode magnitude
+            self.A_matrix[i*2, 2] = z_comp * self.A_matrix[i*2, 2]
+            self.A_matrix[i*2+1, 2] = z_comp * self.A_matrix[i*2+1, 2]
+
+        self.odometry_x = 0
+        self.odometry_y = 0
+        self.odometry_theta = 0
+
         for module in self.modules:
             module.reset_steer_setpoint()
 
@@ -48,6 +75,37 @@ class SwerveChassis:
             else:
                 vx, vy = self.vx, self.vy
             module.set_velocity(vx+vz_x, vy+vz_y)
+
+        odometry_outputs = np.zeros((8, 1))
+        velocity_outputs = np.zeros((8, 1))
+        for i, module in enumerate(self.modules):
+            odometry_x, odometry_y = module.get_cartesian_delta()
+            velocity_x, velocity_y = module.get_cartesian_vel()
+            odometry_outputs[i*2] = odometry_x
+            odometry_outputs[i*2+1] = odometry_y
+            velocity_outputs[i*2] = velocity_x
+            velocity_outputs[i*2+1] = velocity_y
+
+            module.reset_encoder_delta()
+
+        delta_x, delta_y, delta_theta = self.robot_movement_from_odometry(
+                                            odometry_outputs)
+        v_x, v_y, v_z = self.robot_movement_from_odometry(velocity_outputs)
+
+        self.odometry_x += delta_x
+        self.odometry_y += delta_y
+        self.odometry_theta += delta_theta
+        self.odometry_x_vel = v_x
+        self.odometry_y_vel = v_y
+        self.odometry_z_vel = v_z
+
+    def robot_movement_from_odometry(self, odometry_outputs):
+        lstsq_ret = np.linalg.lstsq(self.A_matrix, odometry_outputs,
+                                    rcond=None)
+        x, y, theta = lstsq_ret[0]
+        angle = self.bno055.getAngle()
+        x_field, y_field = self.field_orient(x, y, angle)
+        return x_field, y_field, theta
 
     def set_inputs(self, vx, vy, vz):
         """Set chassis vx, vy, and vz components of inputs.
