@@ -6,9 +6,9 @@ from pyswervedrive.swervechassis import SwerveChassis
 from pyswervedrive.swervemodule import SwerveModule
 from utilities.bno055 import BNO055
 
-from ctre import CANTalon
+import ctre
 
-from networktables import NetworkTable
+from networktables import NetworkTables
 
 import logging
 
@@ -25,20 +25,20 @@ class Robot(magicbot.MagicRobot):
         '''Create motors and stuff here'''
 
         self.module_a = SwerveModule(  # top left module
-                steer_talon=CANTalon(8), drive_talon=CANTalon(13),
+                steer_talon=ctre.WPI_TalonSRX(8), drive_talon=ctre.WPI_TalonSRX(13),
                 steer_enc_offset=-2.703, x_pos=0.3, y_pos=0.3,
                 drive_free_speed=Robot.module_drive_free_speed,
                 reverse_drive_direction=True, reverse_drive_encoder=True)
         self.module_b = SwerveModule(  # bottom left modulet
-                steer_talon=CANTalon(2), drive_talon=CANTalon(9),
+                steer_talon=ctre.WPI_TalonSRX(2), drive_talon=ctre.WPI_TalonSRX(9),
                 steer_enc_offset=-2.750, x_pos=-0.3, y_pos=0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
         self.module_c = SwerveModule(  # bottom right modulet
-                steer_talon=CANTalon(4), drive_talon=CANTalon(14),
+                steer_talon=ctre.WPI_TalonSRX(4), drive_talon=ctre.WPI_TalonSRX(14),
                 steer_enc_offset=-1.888, x_pos=-0.3, y_pos=-0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
         self.module_d = SwerveModule(  # top right modulet
-                steer_talon=CANTalon(11), drive_talon=CANTalon(6),
+                steer_talon=ctre.WPI_TalonSRX(11), drive_talon=ctre.WPI_TalonSRX(6),
                 steer_enc_offset=-2.925, x_pos=0.3, y_pos=-0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
 
@@ -56,14 +56,11 @@ class Robot(magicbot.MagicRobot):
         # create the imu object
         self.bno055 = BNO055()
 
-        # the "logger" - allows you to print to the logging screen
-        # of the control computer
-        self.logger = logging.getLogger("robot")
         # the SmartDashboard network table allows you to send
         # information to a html dashboard. useful for data display
         # for drivers, and also for plotting variables over time
         # while debugging
-        self.sd = NetworkTable.getTable('SmartDashboard')
+        self.sd = NetworkTables.getTable('SmartDashboard')
 
         # boilerplate setup for the joystick
         self.joystick = wpilib.Joystick(0)
