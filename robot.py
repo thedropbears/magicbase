@@ -25,21 +25,21 @@ class Robot(magicbot.MagicRobot):
         '''Create motors and stuff here'''
 
         self.module_a = SwerveModule(  # top left module
-                steer_talon=ctre.WPI_TalonSRX(8), drive_talon=ctre.WPI_TalonSRX(13),
-                steer_enc_offset=-2.703, x_pos=0.3, y_pos=0.3,
+                steer_talon=ctre.WPI_TalonSRX(4), drive_talon=ctre.WPI_TalonSRX(13),
+                steer_enc_offset=0.0, x_pos=0.3, y_pos=0.3,
                 drive_free_speed=Robot.module_drive_free_speed,
                 reverse_drive_direction=True, reverse_drive_encoder=True)
         self.module_b = SwerveModule(  # bottom left modulet
                 steer_talon=ctre.WPI_TalonSRX(2), drive_talon=ctre.WPI_TalonSRX(9),
-                steer_enc_offset=-2.750, x_pos=-0.3, y_pos=0.3,
+                steer_enc_offset=0.0, x_pos=-0.3, y_pos=0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
         self.module_c = SwerveModule(  # bottom right modulet
-                steer_talon=ctre.WPI_TalonSRX(4), drive_talon=ctre.WPI_TalonSRX(14),
-                steer_enc_offset=-1.888, x_pos=-0.3, y_pos=-0.3,
+                steer_talon=ctre.WPI_TalonSRX(8), drive_talon=ctre.WPI_TalonSRX(14),
+                steer_enc_offset=0.0, x_pos=-0.3, y_pos=-0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
         self.module_d = SwerveModule(  # top right modulet
                 steer_talon=ctre.WPI_TalonSRX(11), drive_talon=ctre.WPI_TalonSRX(6),
-                steer_enc_offset=-2.925, x_pos=0.3, y_pos=-0.3,
+                steer_enc_offset=0.0, x_pos=0.3, y_pos=-0.3,
                 drive_free_speed=Robot.module_drive_free_speed)
 
         # Objects that are created here are shared with all classes
