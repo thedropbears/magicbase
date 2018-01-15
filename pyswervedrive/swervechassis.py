@@ -80,6 +80,7 @@ class SwerveChassis:
         velocity_outputs = np.zeros((8, 1))
         for i, module in enumerate(self.modules):
             odometry_x, odometry_y = module.get_cartesian_delta()
+            # print("dx %s, dy %s" % (odometry_x, odometry_y))
             velocity_x, velocity_y = module.get_cartesian_vel()
             odometry_outputs[i*2, 0] = odometry_x
             odometry_outputs[i*2+1, 0] = odometry_y
@@ -97,14 +98,17 @@ class SwerveChassis:
         self.odometry_x_vel = v_x
         self.odometry_y_vel = v_y
         self.odometry_z_vel = v_z
+        print("x %s, y %s, z %s" % (self.odometry_x, self.odometry_y, self.odometry_theta))
 
     def robot_movement_from_odometry(self, odometry_outputs):
         lstsq_ret = np.linalg.lstsq(self.A_matrix, odometry_outputs,
                                     rcond=-1)
-        x, y, theta = lstsq_ret[0]
-        angle = self.bno055.getAngle()
-        x_field, y_field = self.field_orient(x, y, angle)
-        return x_field, y_field, theta
+        x, y, theta = lstsq_ret[0].reshape(3)
+        # print(lstsq_ret[0].reshape(3))
+        # angle = self.bno055.getAngle()
+        # x_field, y_field = self.field_orient(x, y, angle)
+        # return x_field, y_field, theta
+        return x, y, theta
 
     def set_inputs(self, vx, vy, vz):
         """Set chassis vx, vy, and vz components of inputs.

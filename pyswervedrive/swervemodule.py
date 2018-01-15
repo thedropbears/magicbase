@@ -56,8 +56,10 @@ class SwerveModule:
         self.steer_motor.config_kI(0, 0.0, 10)
         self.steer_motor.config_kD(0, 0.0, 10)
         self.steer_motor.selectProfileSlot(0, 0)
-        self.drive_motor.config_kF(0, 0, 10)
+        self.steer_motor.config_kF(0, 0, 10)
         self.reset_steer_setpoint()
+
+        self.steer_motor.setNeutralMode(True)
 
         self.drive_motor.configSelectedFeedbackSensor(ctre.FeedbackDevice.QuadEncoder, 0, 10)
         # changes sign of motor throttle values
@@ -69,6 +71,8 @@ class SwerveModule:
         self.drive_motor.config_kD(0, 0.0, 10)
         self.drive_motor.config_kF(0, 1024.0/self.drive_free_speed, 10)
         self.drive_motor.selectProfileSlot(0, 0)
+
+        self.drive_motor.setNeutralMode(True)
 
         self.reset_encoder_delta()
 
@@ -90,7 +94,6 @@ class SwerveModule:
         sp = self.steer_motor.getSelectedSensorPosition(0)[1]
         self.current_azimuth_sp = float(sp - self.steer_enc_offset) / self.STEER_COUNTS_PER_RADIAN
         self.steer_motor.set(ctre.ControlMode.Position, sp)
-        print(sp)
 
     def reset_encoder_delta(self):
         """Re-zero the encoder deltas as returned from
@@ -109,8 +112,8 @@ class SwerveModule:
         odometry.
         """
         steer_delta = self.current_measured_azimuth - self.zero_azimuth
-        drive_delta = self.zero_drive_pos - (self.drive_motor.getSelectedSensorPosition(0)[1]
-                                             / self.drive_counts_per_metre)
+        drive_delta = (self.drive_motor.getSelectedSensorPosition(0)[1]
+                       / self.drive_counts_per_metre) - self.zero_drive_pos
         return steer_delta, drive_delta
 
     def get_cartesian_delta(self):
@@ -121,9 +124,7 @@ class SwerveModule:
         """
         azimuth_delta, drive_delta = self.get_encoder_delta()
 
-        current_azimuth = (self.drive_motor.getSelectedSensorPosition(0)[1]
-                           / self.drive_counts_per_metre)
-        avg_azimuth = current_azimuth - (azimuth_delta / 2)
+        avg_azimuth = self.current_measured_azimuth - (azimuth_delta / 2)
 
         drive_x_delta = drive_delta * math.cos(avg_azimuth)
         drive_y_delta = drive_delta * math.sin(avg_azimuth)
@@ -155,8 +156,6 @@ class SwerveModule:
         # if we have a really low velocity, don't do anything. This is to
         # prevent stuff like joystick whipping back and changing the module
         # azimuth
-        print(self.steer_motor.getClosedLoopError(0))
-        print(self)
         if velocity < 0.1:
             self.drive_motor.stopMotor()
             self.steer_motor.stopMotor()
@@ -178,7 +177,6 @@ class SwerveModule:
         # # convert the direction to encoder counts to set as the closed-loop setpoint
         # setpoint = (azimuth_to_set * self.STEER_COUNTS_PER_RADIAN
         #             + self.steer_enc_offset)
-        # print(setpoint)
         # self.steer_motor.set(ctre.ControlMode.Position, setpoint)
         # self.current_azimuth_sp = azimuth_to_set
         #
